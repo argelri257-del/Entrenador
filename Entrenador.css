@@ -197,7 +197,7 @@
   }
  
   .option-btn:hover:not(:disabled) {
-    border-color: var(--accent2);
+    border-color: var(--accent);
     background: rgba(124,108,252,0.08);
     transform: translateY(-1px);
   }
