@@ -10,7 +10,7 @@
     --bg: #0a0a0f;
     --panel: #13131a;
     --border: #2a2a3a;
-    --accent: #00e5a0;
+    --accent: #00b37a;
     --accent2: #7c6cfc;
     --warn: #ff6b6b;
     --text: #e8e8f0;
@@ -183,7 +183,7 @@
   }
  
   .option-btn {
-    background: #1a1a26;
+    background: #2e2e42;
     border: 1.5px solid var(--border);
     border-radius: 10px;
     padding: 14px 16px;
