@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrenador Lógico-Matemático</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --panel: #13131a;
+    --border: #2a2a3a;
+    --accent: #00e5a0;
+    --accent2: #7c6cfc;
+    --warn: #ff6b6b;
+    --text: #e8e8f0;
+    --muted: #6b6b85;
+    --correct: #00e5a0;
+    --wrong: #ff6b6b;
+  }
+ 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(124,108,252,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 30% at 10% 80%, rgba(0,229,160,0.05) 0%, transparent 60%);
+  }
+ 
+  header {
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+ 
+  .logo {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+ 
+  h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+ 
+  .subtitle { font-size: 0.78rem; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
+ 
+  .stats-bar {
+    width: 100%; max-width: 720px;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-bottom: 24px;
+  }
+ 
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+ 
+  .stat-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Space Mono', monospace; }
+  .stat-value { font-size: 1.5rem; font-weight: 800; margin-top: 4px; }
+  .stat-value.green { color: var(--accent); }
+  .stat-value.purple { color: var(--accent2); }
+  .stat-value.red { color: var(--warn); }
+ 
+  .difficulty-selector {
+    width: 100%; max-width: 720px;
+    display: flex; gap: 8px; margin-bottom: 20px;
+  }
+ 
+  .diff-btn {
+    flex: 1; padding: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+ 
+  .diff-btn:hover { border-color: var(--accent2); color: var(--text); }
+  .diff-btn.active { background: linear-gradient(135deg, var(--accent2), #5a4cd4); border-color: transparent; color: #fff; }
+ 
+  .category-row {
+    width: 100%; max-width: 720px;
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+  }
+ 
+  .cat-btn {
+    padding: 6px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+ 
+  .cat-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cat-btn.active { background: rgba(0,229,160,0.1); border-color: var(--accent); color: var(--accent); }
+ 
+  .question-card {
+    width: 100%; max-width: 720px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+ 
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+ 
+  .q-meta {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px;
+  }
+ 
+  .q-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; color: var(--muted);
+  }
+ 
+  .q-tag {
+    font-size: 0.68rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-family: 'Space Mono', monospace;
+  }
+ 
+  .tag-facil { background: rgba(0,229,160,0.1); color: var(--accent); border: 1px solid rgba(0,229,160,0.25); }
+  .tag-medio { background: rgba(124,108,252,0.1); color: var(--accent2); border: 1px solid rgba(124,108,252,0.25); }
+  .tag-dificil { background: rgba(255,107,107,0.1); color: var(--warn); border: 1px solid rgba(255,107,107,0.25); }
+ 
+  .timer-badge {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem; font-weight: 700;
+    color: var(--accent);
+  }
+  .timer-badge.warning { color: var(--warn); animation: pulse 0.8s infinite; }
+ 
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+ 
+  .question-text {
+    font-size: 1.05rem; line-height: 1.65;
+    margin-bottom: 24px;
+    font-weight: 400;
+  }
+ 
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+ 
+  .option-btn {
+    background: #1a1a26;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: left;
+    display: flex; align-items: center; gap: 10px;
+    line-height: 1.4;
+  }
+ 
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent2);
+    background: rgba(124,108,252,0.08);
+    transform: translateY(-1px);
+  }
+ 
+  .option-btn .opt-label {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 700;
+    flex-shrink: 0;
+    font-family: 'Space Mono', monospace;
+    transition: all 0.18s;
+  }
+ 
+  .option-btn:hover:not(:disabled) .opt-label {
+    background: var(--accent2);
+    color: #fff;
+  }
+ 
+  .option-btn.correct {
+    border-color: var(--correct);
+    background: rgba(0,229,160,0.08);
+  }
+  .option-btn.correct .opt-label { background: var(--correct); color: #000; }
+ 
+  .option-btn.wrong {
+    border-color: var(--wrong);
+    background: rgba(255,107,107,0.08);
+  }
+  .option-btn.wrong .opt-label { background: var(--wrong); color: #fff; }
+ 
+  .option-btn:disabled { cursor: default; opacity: 0.8; }
+ 
+  .explanation-box {
+    background: rgba(0,229,160,0.05);
+    border: 1px solid rgba(0,229,160,0.2);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #b0f0d8;
+    display: none;
+  }
+ 
+  .explanation-box.show { display: block; animation: fadeIn 0.3s ease; }
+  .explanation-box .exp-title { font-weight: 700; color: var(--accent); margin-bottom: 6px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; font-family: 'Space Mono', monospace; }
+ 
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+ 
+  .action-row {
+    width: 100%; max-width: 720px;
+    display: flex; gap: 10px;
+  }
+ 
+  .btn-primary {
+    flex: 1; padding: 14px;
+    background: linear-gradient(135deg, var(--accent), #00b87a);
+    border: none; border-radius: 10px;
+    color: #000; font-family: 'Syne', sans-serif;
+    font-size: 0.92rem; font-weight: 800;
+    cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+ 
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,229,160,0.25); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+ 
+  .btn-secondary {
+    padding: 14px 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted); font-family: 'Syne', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+ 
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--text); }
+ 
+  .loading-state {
+    text-align: center;
+    padding: 40px 20px;
+  }
+ 
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    animation: spin 0.8s linear infinite;
+  }
+ 
+  @keyframes spin { to { transform: rotate(360deg); } }
+ 
+  .loading-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+ 
+  .loading-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+  @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+ 
+  .error-box {
+    background: rgba(255,107,107,0.08);
+    border: 1px solid rgba(255,107,107,0.3);
+    border-radius: 10px;
+    padding: 16px;
+    color: #ffaaaa;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+ 
+  .progress-track {
+    width: 100%; max-width: 720px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+ 
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+ 
+  @media (max-width: 500px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+ 
+<header>
+  <div class="logo">🧮</div>
+  <div>
+    <h1>Entrenador <span>Lógico</span></h1>
+    <div class="subtitle">Preparación para entrevista · IA en tiempo real</div>
+  </div>
+</header>
+ 
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="stat-label">Pregunta</div>
+    <div class="stat-value purple" id="stat-q">1</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Correctas</div>
+    <div class="stat-value green" id="stat-correct">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Incorrectas</div>
+    <div class="stat-value red" id="stat-wrong">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Precisión</div>
+    <div class="stat-value" id="stat-acc">—</div>
+  </div>
+</div>
+ 
+<div class="progress-track">
+  <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+</div>
+ 
+<div class="difficulty-selector">
+  <button class="diff-btn active" data-diff="fácil" onclick="setDiff(this)">Fácil</button>
+  <button class="diff-btn" data-diff="intermedio" onclick="setDiff(this)">Medio</button>
+  <button class="diff-btn" data-diff="difícil" onclick="setDiff(this)">Difícil</button>
+</div>
+ 
+<div class="category-row">
+  <button class="cat-btn active" data-cat="aleatoria" onclick="setCat(this)">🎲 Aleatoria</button>
+  <button class="cat-btn" data-cat="series numéricas" onclick="setCat(this)">🔢 Series</button>
+  <button class="cat-btn" data-cat="aritmética" onclick="setCat(this)">➕ Aritmética</button>
+  <button class="cat-btn" data-cat="porcentajes y proporciones" onclick="setCat(this)">📊 Porcentajes</button>
+  <button class="cat-btn" data-cat="lógica y razonamiento abstracto" onclick="setCat(this)">🧩 Lógica</button>
+  <button class="cat-btn" data-cat="álgebra básica" onclick="setCat(this)">📐 Álgebra</button>
+</div>
+ 
+<div class="question-card" id="question-card">
+  <div class="loading-state" id="initial-load">
+    <div class="spinner"></div>
+    <div class="loading-text">Generando tu primera pregunta<span class="loading-dots"></span></div>
+  </div>
+  <div id="question-content" style="display:none">
+    <div class="q-meta">
+      <span class="q-num" id="q-num">Pregunta #1</span>
+      <span class="q-tag" id="q-tag"></span>
+      <span class="timer-badge" id="timer">⏱ 00:00</span>
+    </div>
+    <div class="question-text" id="question-text"></div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="explanation-box" id="explanation-box">
+      <div class="exp-title">💡 Explicación</div>
+      <div id="explanation-text"></div>
+    </div>
+  </div>
+</div>
+ 
+<div class="action-row">
+  <button class="btn-primary" id="next-btn" onclick="loadQuestion()" disabled>
+    Nueva Pregunta →
+  </button>
+  <button class="btn-secondary" onclick="skipQuestion()">Saltar</button>
+</div>
+ 
+<script>
+const API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = "claude-sonnet-4-20250514";
+ 
+let stats = { q: 1, correct: 0, wrong: 0, total: 0 };
+let currentDiff = "fácil";
+let currentCat = "aleatoria";
+let answered = false;
+let timerInterval = null;
+let startTime = null;
+ 
+function setDiff(btn) {
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentDiff = btn.dataset.diff;
+}
+ 
+function setCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat = btn.dataset.cat;
+}
+ 
+function updateStats() {
+  document.getElementById('stat-q').textContent = stats.q;
+  document.getElementById('stat-correct').textContent = stats.correct;
+  document.getElementById('stat-wrong').textContent = stats.wrong;
+  const acc = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) + '%' : '—';
+  const el = document.getElementById('stat-acc');
+  el.textContent = acc;
+  el.style.color = stats.total === 0 ? 'var(--text)' :
+    (stats.correct / stats.total >= 0.7 ? 'var(--accent)' : 'var(--warn)');
+  const pct = Math.min(((stats.q - 1) / 20) * 100, 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+ 
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  startTime = Date.now();
+  const el = document.getElementById('timer');
+  timerInterval = setInterval(() => {
+    const secs = Math.floor((Date.now() - startTime) / 1000);
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    el.textContent = `⏱ ${m}:${s}`;
+    el.classList.toggle('warning', secs > 60);
+  }, 1000);
+}
+ 
+function stopTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+}
+ 
+function skipQuestion() {
+  stats.q++;
+  updateStats();
+  loadQuestion();
+}
+ 
+async function loadQuestion() {
+  answered = false;
+  stopTimer();
+ 
+  const card = document.getElementById('question-card');
+  const content = document.getElementById('question-content');
+  const initialLoad = document.getElementById('initial-load');
+ 
+  // Show loading
+  content.style.display = 'none';
+  initialLoad.style.display = 'block';
+  initialLoad.innerHTML = '<div class="spinner"></div><div class="loading-text">Generando pregunta<span class="loading-dots"></span></div>';
+  card.style.borderColor = 'var(--border)';
+  document.getElementById('next-btn').disabled = true;
+  document.getElementById('explanation-box').classList.remove('show');
+ 
+  const catPrompt = currentCat === 'aleatoria'
+    ? 'una categoría aleatoria de: series numéricas, aritmética, porcentajes, lógica, álgebra'
+    : currentCat;
+ 
+  const prompt = `Eres un experto en pruebas de razonamiento lógico-matemático para entrevistas de trabajo corporativas (tipo GMAT, PSP, SHL). 
+  
+Genera UNA pregunta de dificultad ${currentDiff} sobre ${catPrompt}.
+ 
+Responde ÚNICAMENTE con un objeto JSON (sin markdown, sin backticks, sin texto extra):
+{
+  "categoria": "nombre de la categoría",
+  "dificultad": "${currentDiff}",
+  "pregunta": "texto completo de la pregunta, puede incluir datos numéricos o tablas en texto",
+  "opciones": ["opción A", "opción B", "opción C", "opción D"],
+  "correcta": 0,
+  "explicacion": "explicación paso a paso de cómo resolver el problema correctamente"
+}
+ 
+El índice "correcta" va de 0 a 3. La pregunta debe ser realista, de nivel entrevista corporativa.`;
+ 
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+ 
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      throw new Error('HTTP ' + res.status + ': ' + errBody.slice(0, 200));
+    }
+ 
+    const data = await res.json();
+    const blocks = data.content || [];
+    const raw = blocks.map(b => b.text || '').join('').trim();
+ 
+    if (!raw) throw new Error('Respuesta vacía. Estructura: ' + JSON.stringify(data).slice(0, 200));
+ 
+    // Extract JSON robustly — works even if wrapped in markdown or extra text
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Sin JSON en respuesta: ' + raw.slice(0, 200));
+ 
+    let qData;
+    try {
+      qData = JSON.parse(jsonMatch[0]);
+    } catch(e) {
+      throw new Error('JSON inválido: ' + e.message + ' | ' + jsonMatch[0].slice(0, 150));
+    }
+ 
+    if (!qData.pregunta || !Array.isArray(qData.opciones)) {
+      throw new Error('Campos faltantes: ' + JSON.stringify(qData).slice(0, 200));
+    }
+ 
+    renderQuestion(qData);
+ 
+  } catch (err) {
+    initialLoad.innerHTML = `<div class="error-box">⚠️ Error al generar pregunta: ${err.message}<br><br>Verifica tu conexión e intenta de nuevo.</div>`;
+    document.getElementById('next-btn').disabled = false;
+  }
+}
+ 
+function renderQuestion(q) {
+  const initialLoad = document.getElementById('initial-load');
+  const content = document.getElementById('question-content');
+ 
+  initialLoad.style.display = 'none';
+  content.style.display = 'block';
+ 
+  // Meta
+  document.getElementById('q-num').textContent = `Pregunta #${stats.q}`;
+  const tag = document.getElementById('q-tag');
+  tag.textContent = q.categoria;
+  tag.className = 'q-tag';
+  if (q.dificultad?.includes('fácil') || q.dificultad?.includes('facil')) tag.classList.add('tag-facil');
+  else if (q.dificultad?.includes('intermedio') || q.dificultad?.includes('medio')) tag.classList.add('tag-medio');
+  else tag.classList.add('tag-dificil');
+ 
+  // Question
+  document.getElementById('question-text').textContent = q.pregunta;
+ 
+  // Options
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  const labels = ['A', 'B', 'C', 'D'];
+ 
+  q.opciones.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-label">${labels[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i, q.correcta, q.explicacion, q.opciones.length);
+    grid.appendChild(btn);
+  });
+ 
+  document.getElementById('explanation-box').classList.remove('show');
+  startTimer();
+}
+ 
+function selectAnswer(chosen, correct, explanation, total) {
+  if (answered) return;
+  answered = true;
+  stopTimer();
+ 
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+ 
+  const isCorrect = chosen === correct;
+ 
+  btns[chosen].classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) btns[correct].classList.add('correct');
+ 
+  const card = document.getElementById('question-card');
+  card.style.borderColor = isCorrect ? 'var(--correct)' : 'var(--wrong)';
+ 
+  document.getElementById('explanation-text').textContent = explanation;
+  document.getElementById('explanation-box').classList.add('show');
+ 
+  stats.total++;
+  if (isCorrect) stats.correct++; else stats.wrong++;
+  stats.q++;
+  updateStats();
+ 
+  document.getElementById('next-btn').disabled = false;
+}
+ 
+// Init
+updateStats();
+loadQuestion();
+</script>
+</body>
+</html>

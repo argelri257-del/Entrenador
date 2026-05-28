@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrenador Lógico-Matemático</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="Entrenador.css" />
+</head>
+<body>
+
+  <header>
+    <div class="logo">🧮</div>
+    <div>
+      <h1>Entrenador <span>Lógico</span></h1>
+      <div class="subtitle">Razonamiento matemático dinámico</div>
+    </div>
+  </header>
+
+  <!-- Barra de estadísticas -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Puntaje</div>
+      <div class="stat-value green" id="stat-score">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Correctas</div>
+      <div class="stat-value green" id="stat-correct">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Incorrectas</div>
+      <div class="stat-value red" id="stat-wrong">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Racha</div>
+      <div class="stat-value purple" id="stat-streak">0</div>
+    </div>
+  </div>
+
+  <!-- Barra de progreso -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <!-- Selector de dificultad -->
+  <div class="difficulty-selector">
+    <button class="diff-btn active" data-diff="facil">Fácil</button>
+    <button class="diff-btn" data-diff="medio">Medio</button>
+    <button class="diff-btn" data-diff="dificil">Difícil</button>
+  </div>
+
+  <!-- Categorías -->
+  <div class="category-row">
+    <button class="cat-btn active" data-cat="todas">Todas</button>
+    <button class="cat-btn" data-cat="aritmetica">Aritmética</button>
+    <button class="cat-btn" data-cat="secuencias">Secuencias</button>
+    <button class="cat-btn" data-cat="logica">Lógica</button>
+    <button class="cat-btn" data-cat="geometria">Geometría</button>
+    <button class="cat-btn" data-cat="problemas">Problemas</button>
+  </div>
+
+  <!-- Tarjeta de pregunta -->
+  <div class="question-card" id="question-card">
+    <div id="question-content">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <div class="loading-text">Generando pregunta<span class="loading-dots"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="action-row">
+    <button class="btn-primary" id="btn-next" disabled>Siguiente pregunta →</button>
+    <button class="btn-secondary" id="btn-skip">Saltar</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
